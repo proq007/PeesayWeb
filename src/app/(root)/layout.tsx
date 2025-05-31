@@ -1,3 +1,4 @@
+"use client";
 import type React from "react";
 import { Icons } from "@/components/icons";
 import {
@@ -14,14 +15,25 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { Circle } from "lucide-react";
+import { Circle, LogOut } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/context/auth-provider";
 
 export default function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   return (
     <SidebarProvider>
       <div className="md:hidden">
@@ -101,6 +113,15 @@ export default function DashboardLayout({
         <SidebarFooter>
           <SidebarGroup>
             <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={handleLogout}
+                  className="cursor-pointer hover:bg-red-50 hover:text-red-600 transition-colors"
+                >
+                  <LogOut className="size-4" />
+                  <span>Logout</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link href="/settings">
