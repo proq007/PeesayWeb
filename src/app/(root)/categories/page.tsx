@@ -187,7 +187,7 @@ export default function CategoriesPage() {
                 : "No categories available."}
             </div>
           ) : (
-            <ScrollArea className="h-[600px] w-full">
+            <ScrollArea className="h-[600px] w-full p-3">
               <Table>
                 <TableHeader>
                   <TableRow>
