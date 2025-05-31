@@ -1,19 +1,7 @@
-"use client";
+import React from "react";
 
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+const page = () => {
+  return <div>page</div>;
+};
 
-export default function Home() {
-  const router = useRouter();
-  const status = "unauthenticated"; // Replace with actual authentication status
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    } else {
-      router.push("/dashboard");
-    }
-  }, [router, status]);
-
-  return null;
-}
+export default page;
