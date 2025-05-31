@@ -142,8 +142,6 @@ export default function DashboardPage() {
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  const { logout } = useAuth();
-
   // Helper function to safely parse dates
   const safeParsDate = (dateString: string | Date): Date => {
     if (dateString instanceof Date) return dateString;
