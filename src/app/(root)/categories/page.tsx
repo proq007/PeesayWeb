@@ -60,7 +60,7 @@ const sortCategories = <T extends { [key: string]: any }>(
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortColumn, setSortColumn] = useState<"name" | "id" | null>(null);
+  const [sortColumn, setSortColumn] = useState<"name" | "id" | null>("id");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
