@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -9,7 +9,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
@@ -38,14 +37,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import {
-  Trash2,
-  Eye,
-  EyeOff,
-  RefreshCw,
-  Lightbulb,
-  ChevronDown,
-} from "lucide-react";
+import { Trash2, Eye, RefreshCw, Lightbulb, ChevronDown } from "lucide-react";
 import { financeApi, AIInsight, Transaction } from "@/services/finance-api";
 import { toast } from "@/hooks/use-toast";
 import {
@@ -121,178 +113,27 @@ const FinancialInsightsSummary = () => {
             <p>Loading financial data...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="text-center p-4 bg-green-50 rounded-lg">
               <p className="text-sm text-green-600">Total Income</p>
-              <p className="text-2xl font-bold text-green-700">
+              <p className="text-xl sm:text-2xl font-bold text-green-700">
                 ${safeIncome.toFixed(2)}
               </p>
             </div>
             <div className="text-center p-4 bg-red-50 rounded-lg">
               <p className="text-sm text-red-600">Total Expenses</p>
-              <p className="text-2xl font-bold text-red-700">
+              <p className="text-xl sm:text-2xl font-bold text-red-700">
                 ${safeExpenses.toFixed(2)}
               </p>
             </div>
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
+            <div className="text-center p-4 bg-blue-50 rounded-lg sm:col-span-2 lg:col-span-1">
               <p className="text-sm text-blue-600">Savings Rate</p>
-              <p className="text-2xl font-bold text-blue-700">{savingsRate}%</p>
+              <p className="text-xl sm:text-2xl font-bold text-blue-700">
+                {savingsRate}%
+              </p>
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
-  );
-};
-
-const ChatbotInterface = () => {
-  const [messages, setMessages] = useState<{ text: string; isUser: boolean }[]>(
-    [
-      {
-        text: "Hello! I can help you understand your financial insights. Try asking about your spending patterns, budget recommendations, or savings goals!",
-        isUser: false,
-      },
-    ]
-  );
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isResetting, setIsResetting] = useState(false);
-  const chatBottomRef = useRef<HTMLDivElement>(null);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
-  };
-
-  const handleSendMessage = async () => {
-    if (input.trim() !== "") {
-      const userMessage = { text: input, isUser: true };
-      setMessages((prevMessages) => [...prevMessages, userMessage]);
-      const currentInput = input;
-      setInput("");
-      setIsLoading(true);
-
-      try {
-        // For now, provide some basic financial guidance based on input
-        let response = "I'm here to help with your finances! ";
-
-        if (currentInput.toLowerCase().includes("budget")) {
-          response +=
-            "Based on your spending patterns, consider setting monthly limits for discretionary expenses like dining out and entertainment.";
-        } else if (currentInput.toLowerCase().includes("saving")) {
-          response +=
-            "A good savings goal is 20% of your income. Consider automating transfers to your savings account.";
-        } else if (currentInput.toLowerCase().includes("expense")) {
-          response +=
-            "Review your largest expense categories and look for opportunities to reduce spending without impacting your quality of life.";
-        } else if (currentInput.toLowerCase().includes("income")) {
-          response +=
-            "Consider diversifying your income sources through side projects, investments, or skill development for career advancement.";
-        } else {
-          response +=
-            "I can help you with budgeting, saving strategies, expense analysis, and general financial planning. What specific area would you like to focus on?";
-        }
-
-        const botMessage = { text: response, isUser: false };
-        setMessages((prevMessages) => [...prevMessages, botMessage]);
-      } catch (error: any) {
-        console.error("Failed to generate AI response", error);
-        const botMessage = {
-          text: "Sorry, I'm having trouble right now. Please try again later or contact support if the issue persists.",
-          isUser: false,
-        };
-        setMessages((prevMessages) => [...prevMessages, botMessage]);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    setTimeout(() => {
-      chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-  };
-
-  const confirmResetChat = () => {
-    setMessages([
-      {
-        text: "Hello! I can help you understand your financial insights. Try asking about your spending patterns, budget recommendations, or savings goals!",
-        isUser: false,
-      },
-    ]);
-    setIsResetting(false);
-    setTimeout(() => {
-      chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-  };
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>AI Financial Assistant</CardTitle>
-        <CardDescription>Ask me anything about your finances!</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col h-[400px]">
-        <ScrollArea className="flex-grow">
-          <div className="flex flex-col space-y-2">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`p-3 rounded-md max-w-[80%] ${
-                  message.isUser
-                    ? "bg-primary text-primary-foreground self-end ml-auto"
-                    : "bg-muted self-start mr-auto"
-                }`}
-              >
-                {message.text}
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex items-center space-x-2 self-start mr-auto p-3">
-                <RefreshCw className="h-4 w-4 animate-spin" />
-                <span className="text-sm text-muted-foreground">
-                  Thinking...
-                </span>
-              </div>
-            )}
-            <div ref={chatBottomRef} />
-          </div>
-        </ScrollArea>
-        <div className="flex flex-row items-center gap-2 mt-4">
-          <Input
-            type="text"
-            placeholder="Ask about your finances..."
-            value={input}
-            onChange={handleInputChange}
-            className="flex-grow"
-            disabled={isLoading}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !isLoading) {
-                handleSendMessage();
-              }
-            }}
-          />
-          <Button onClick={handleSendMessage} disabled={isLoading}>
-            Send
-          </Button>
-          <AlertDialog open={isResetting} onOpenChange={setIsResetting}>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                Reset
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Reset Chat History?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will clear all messages in the current conversation.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={confirmResetChat}>
-                Reset
-              </AlertDialogAction>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
       </CardContent>
     </Card>
   );
@@ -323,92 +164,343 @@ const GeneratedInsightsTable = () => {
 
     if (typeof insight.insight_data === "string") {
       return (
-        <div className="max-w-xs">
-          <p className="truncate text-sm">{insight.insight_data}</p>
+        <div className="w-full min-w-0">
+          <p className="text-sm break-words whitespace-pre-wrap leading-relaxed">
+            {insight.insight_data}
+          </p>
         </div>
       );
     }
 
-    if (
-      insight.insight_data &&
-      typeof insight.insight_data === "object" &&
-      "suggestions" in insight.insight_data &&
-      Array.isArray(insight.insight_data.suggestions)
-    ) {
-      const suggestions = insight.insight_data.suggestions;
+    if (insight.insight_data && typeof insight.insight_data === "object") {
+      // Handle spending_trend insights
+      if (
+        "income" in insight.insight_data &&
+        "budget_summary" in insight.insight_data &&
+        "spending_category" in insight.insight_data
+      ) {
+        const { income, budget_summary, spending_category } =
+          insight.insight_data as {
+            income: { amount: number; transactions: any[] };
+            budget_summary: {
+              spent_amount: number;
+              total_budget: number;
+              remaining_amount: number;
+            };
+            spending_category: Record<
+              string,
+              { amount: number; transactions: any[] }
+            >;
+          };
+        const categoryEntries = Object.entries(spending_category || {});
 
-      if (suggestions.length === 0) {
         return (
-          <div className="max-w-xs">
-            <p className="text-sm text-muted-foreground">
-              No suggestions available
-            </p>
-          </div>
-        );
-      }
-
-      if (suggestions.length === 1) {
-        return (
-          <div className="max-w-xs">
-            <div className="text-sm">
-              <span className="font-medium text-blue-600">
-                {suggestions[0].category}:
-              </span>
-              <p className="mt-1 text-gray-700">{suggestions[0].message}</p>
-            </div>
-          </div>
-        );
-      }
-
-      return (
-        <div className="max-w-xs">
-          <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-            <div className="space-y-2">
-              <div className="text-sm">
-                <span className="font-medium text-blue-600">
-                  {suggestions[0].category}:
-                </span>
-                <p className="mt-1 text-gray-700">
-                  {isExpanded
-                    ? suggestions[0].message
-                    : suggestions[0].message.substring(0, 50) + "..."}
-                </p>
+          <div className="w-full min-w-0">
+            <div className="space-y-3">
+              {/* Income & Budget Summary */}
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="bg-green-50 p-2 rounded">
+                  <p className="text-xs text-green-600 font-medium">
+                    Total Income
+                  </p>
+                  <p className="text-green-800 font-semibold">
+                    ${income.amount?.toLocaleString() || "N/A"}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {income.transactions?.length || 0} transaction(s)
+                  </p>
+                </div>
+                <div className="bg-blue-50 p-2 rounded">
+                  <p className="text-xs text-blue-600 font-medium">
+                    Total Budget
+                  </p>
+                  <p className="text-blue-800 font-semibold">
+                    ${budget_summary.total_budget?.toLocaleString() || "N/A"}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    $
+                    {budget_summary.remaining_amount?.toLocaleString() || "N/A"}{" "}
+                    remaining
+                  </p>
+                </div>
               </div>
 
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
-                  <ChevronDown
-                    className={`h-3 w-3 mr-1 transition-transform ${
-                      isExpanded ? "rotate-180" : ""
-                    }`}
-                  />
-                  {isExpanded
-                    ? "Show less"
-                    : `+${suggestions.length - 1} more suggestions`}
-                </Button>
-              </CollapsibleTrigger>
-
-              <CollapsibleContent className="space-y-2">
-                {suggestions.slice(1).map((suggestion, index) => (
-                  <div
-                    key={index}
-                    className="text-sm border-l-2 border-gray-200 pl-3"
-                  >
-                    <span className="font-medium text-blue-600">
-                      {suggestion.category}:
-                    </span>
-                    <p className="mt-1 text-gray-700">{suggestion.message}</p>
+              {/* Spending Categories */}
+              {categoryEntries.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                    Spending by Category
+                  </p>
+                  <div className="grid grid-cols-1 gap-2 text-sm">
+                    {categoryEntries.map(
+                      ([categoryName, categoryData]: [string, any]) => (
+                        <div
+                          key={categoryName}
+                          className="bg-orange-50 border border-orange-100 p-2 rounded"
+                        >
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs font-medium text-orange-600 capitalize">
+                              {categoryName}
+                            </span>
+                            <span className="text-orange-800 font-semibold">
+                              ${categoryData.amount?.toLocaleString() || "N/A"}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {categoryData.transactions?.length || 0}{" "}
+                            transaction(s)
+                          </p>
+                        </div>
+                      )
+                    )}
                   </div>
-                ))}
-              </CollapsibleContent>
+                </div>
+              )}
             </div>
-          </Collapsible>
-        </div>
-      );
+          </div>
+        );
+      }
+
+      // Handle financial_health insights
+      if ("financial_health" in insight.insight_data) {
+        const healthData = insight.insight_data.financial_health as {
+          monthly_budget: number;
+          current_balance: number;
+          remaining_budget: number;
+          savings_goal_progress: number;
+        };
+        return (
+          <div className="w-full min-w-0">
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="bg-blue-50 p-2 rounded">
+                <p className="text-xs text-blue-600 font-medium">
+                  Monthly Budget
+                </p>
+                <p className="text-blue-800 font-semibold">
+                  ${healthData.monthly_budget?.toLocaleString() || "N/A"}
+                </p>
+              </div>
+              <div className="bg-green-50 p-2 rounded">
+                <p className="text-xs text-green-600 font-medium">
+                  Current Balance
+                </p>
+                <p className="text-green-800 font-semibold">
+                  ${healthData.current_balance?.toLocaleString() || "N/A"}
+                </p>
+              </div>
+              <div className="bg-orange-50 p-2 rounded">
+                <p className="text-xs text-orange-600 font-medium">
+                  Remaining Budget
+                </p>
+                <p className="text-orange-800 font-semibold">
+                  ${healthData.remaining_budget?.toLocaleString() || "N/A"}
+                </p>
+              </div>
+              <div className="bg-purple-50 p-2 rounded">
+                <p className="text-xs text-purple-600 font-medium">
+                  Savings Progress
+                </p>
+                <p className="text-purple-800 font-semibold">
+                  {healthData.savings_goal_progress || 0}%
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // Handle finance_summary insights (for "other" type)
+      if ("finance_summary" in insight.insight_data) {
+        const summaryData = insight.insight_data.finance_summary as {
+          income: number;
+          expenses: number;
+          net_worth: number;
+          total_budget: number;
+          goal_progress: number;
+        };
+        return (
+          <div className="w-full min-w-0">
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="bg-emerald-50 p-2 rounded">
+                <p className="text-xs text-emerald-600 font-medium">Income</p>
+                <p className="text-emerald-800 font-semibold">
+                  ${summaryData.income?.toLocaleString() || "N/A"}
+                </p>
+              </div>
+              <div className="bg-red-50 p-2 rounded">
+                <p className="text-xs text-red-600 font-medium">Expenses</p>
+                <p className="text-red-800 font-semibold">
+                  ${summaryData.expenses?.toLocaleString() || "N/A"}
+                </p>
+              </div>
+              <div
+                className={`p-2 rounded ${
+                  summaryData.net_worth >= 0 ? "bg-green-50" : "bg-red-50"
+                }`}
+              >
+                <p
+                  className={`text-xs font-medium ${
+                    summaryData.net_worth >= 0
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  Net Worth
+                </p>
+                <p
+                  className={`font-semibold ${
+                    summaryData.net_worth >= 0
+                      ? "text-green-800"
+                      : "text-red-800"
+                  }`}
+                >
+                  ${summaryData.net_worth?.toLocaleString() || "N/A"}
+                </p>
+              </div>
+              <div className="bg-blue-50 p-2 rounded">
+                <p className="text-xs text-blue-600 font-medium">
+                  Total Budget
+                </p>
+                <p className="text-blue-800 font-semibold">
+                  ${summaryData.total_budget?.toLocaleString() || "N/A"}
+                </p>
+              </div>
+              <div className="bg-indigo-50 p-2 rounded col-span-2">
+                <p className="text-xs text-indigo-600 font-medium">
+                  Goal Progress
+                </p>
+                <p className="text-indigo-800 font-semibold">
+                  ${summaryData.goal_progress?.toLocaleString() || "N/A"}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // Handle suggestions-based insights
+      if (
+        "suggestions" in insight.insight_data &&
+        Array.isArray(insight.insight_data.suggestions)
+      ) {
+        const suggestions = insight.insight_data.suggestions;
+
+        if (suggestions.length === 0) {
+          return (
+            <div className="w-full min-w-0">
+              <p className="text-sm text-muted-foreground">
+                No suggestions available
+              </p>
+            </div>
+          );
+        }
+
+        // Helper function to safely get message text
+        const getSafeMessage = (suggestion: any): string => {
+          return (
+            suggestion?.suggestion ||
+            suggestion?.message ||
+            "No message available"
+          );
+        };
+
+        // Helper function to safely get category text
+        const getSafeCategory = (suggestion: any): string => {
+          // Handle category_id by converting to string, or use category, or fallback
+          if (suggestion?.category_id) {
+            return `Category ${suggestion.category_id}`;
+          }
+          return suggestion?.category || "General";
+        };
+
+        // Helper function to truncate text smartly
+        const getTruncatedMessage = (
+          message: string,
+          maxLength: number = 100
+        ): string => {
+          if (message.length <= maxLength) return message;
+          const truncated = message.substring(0, maxLength);
+          const lastSpace = truncated.lastIndexOf(" ");
+          return (
+            (lastSpace > maxLength * 0.7
+              ? truncated.substring(0, lastSpace)
+              : truncated) + "..."
+          );
+        };
+
+        if (suggestions.length === 1) {
+          return (
+            <div className="w-full min-w-0">
+              <div className="text-sm space-y-1">
+                <span className="inline-block font-medium text-blue-600 text-xs px-2 py-1 bg-blue-50 rounded">
+                  {getSafeCategory(suggestions[0])}
+                </span>
+                <p className="text-gray-700 break-words whitespace-pre-wrap leading-relaxed">
+                  {getSafeMessage(suggestions[0])}
+                </p>
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <div className="w-full min-w-0">
+            <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+              <div className="space-y-3">
+                <div className="text-sm space-y-1">
+                  <span className="inline-block font-medium text-blue-600 text-xs px-2 py-1 bg-blue-50 rounded">
+                    {getSafeCategory(suggestions[0])}
+                  </span>
+                  <p className="text-gray-700 break-words whitespace-pre-wrap leading-relaxed">
+                    {isExpanded
+                      ? getSafeMessage(suggestions[0])
+                      : getTruncatedMessage(getSafeMessage(suggestions[0]))}
+                  </p>
+                </div>
+
+                <CollapsibleTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-3 text-xs hover:bg-gray-100 w-full sm:w-auto"
+                  >
+                    <ChevronDown
+                      className={`h-3 w-3 mr-1 transition-transform ${
+                        isExpanded ? "rotate-180" : ""
+                      }`}
+                    />
+                    {isExpanded
+                      ? "Show less"
+                      : `+${suggestions.length - 1} more suggestion${
+                          suggestions.length > 2 ? "s" : ""
+                        }`}
+                  </Button>
+                </CollapsibleTrigger>
+
+                <CollapsibleContent className="space-y-3">
+                  {suggestions.slice(1).map((suggestion, index) => (
+                    <div
+                      key={index}
+                      className="text-sm border-l-2 border-blue-200 pl-3 ml-1 space-y-1"
+                    >
+                      <span className="inline-block font-medium text-blue-600 text-xs px-2 py-1 bg-blue-50 rounded">
+                        {getSafeCategory(suggestion)}
+                      </span>
+                      <p className="text-gray-700 break-words whitespace-pre-wrap leading-relaxed">
+                        {getSafeMessage(suggestion)}
+                      </p>
+                    </div>
+                  ))}
+                </CollapsibleContent>
+              </div>
+            </Collapsible>
+          </div>
+        );
+      }
     }
 
     return (
-      <div className="max-w-xs">
+      <div className="w-full min-w-0">
         <p className="text-sm text-muted-foreground">
           No insight data available
         </p>
@@ -528,12 +620,12 @@ const GeneratedInsightsTable = () => {
         <CardDescription>
           Generated insights to help improve your financial health
         </CardDescription>
-        <div className="flex items-center gap-2 pt-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 pt-2">
           <Select
             value={selectedInsightType}
             onValueChange={setSelectedInsightType}
           >
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-full sm:w-[200px]">
               <SelectValue placeholder="Select insight type" />
             </SelectTrigger>
             <SelectContent>
@@ -548,6 +640,7 @@ const GeneratedInsightsTable = () => {
             onClick={handleGenerateInsight}
             disabled={generatingInsight}
             size="sm"
+            className="w-full sm:w-auto"
           >
             {generatingInsight ? (
               <>
@@ -578,80 +671,107 @@ const GeneratedInsightsTable = () => {
             </p>
           </div>
         ) : (
-          <ScrollArea className="h-[400px] w-full">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Insight</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-[120px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {insights.map((insight) => (
-                  <TableRow key={insight.id}>
-                    <TableCell className="text-sm">
-                      {formatDate(insight.generated_date)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="text-xs">
-                        {insight.insight_type.replace("_", " ")}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <InsightDataCell insight={insight} />
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={insight.is_read ? "secondary" : "default"}
-                      >
-                        {insight.is_read ? "Read" : "New"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        {!insight.is_read && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleMarkAsRead(insight.id)}
+          <div className="w-full">
+            <ScrollArea className="h-[400px] w-full">
+              <div className="min-w-full overflow-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[100px] sm:w-[120px]">
+                        Date
+                      </TableHead>
+                      <TableHead className="w-[120px] sm:w-[140px]">
+                        Type
+                      </TableHead>
+                      <TableHead className="min-w-[200px] sm:min-w-[300px]">
+                        Insight
+                      </TableHead>
+                      <TableHead className="w-[80px] sm:w-[100px]">
+                        Status
+                      </TableHead>
+                      <TableHead className="w-[100px] sm:w-[120px]">
+                        Actions
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {insights.map((insight) => (
+                      <TableRow key={insight.id} className="hover:bg-gray-50">
+                        <TableCell className="text-xs sm:text-sm font-mono">
+                          {formatDate(insight.generated_date)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className="text-xs whitespace-nowrap"
                           >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        )}
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                Delete Insight?
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone. The insight will
-                                be permanently deleted.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteInsight(insight.id)}
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </ScrollArea>
+                            {insight.insight_type.replace("_", " ")}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="p-2 sm:p-4">
+                          <InsightDataCell insight={insight} />
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={insight.is_read ? "secondary" : "default"}
+                            className="text-xs whitespace-nowrap"
+                          >
+                            {insight.is_read ? "Read" : "New"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1 flex-wrap">
+                            {!insight.is_read && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleMarkAsRead(insight.id)}
+                                className="h-8 w-8 p-0"
+                                title="Mark as read"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            )}
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0"
+                                  title="Delete insight"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Delete Insight?
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. The insight
+                                    will be permanently deleted.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() =>
+                                    handleDeleteInsight(insight.id)
+                                  }
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </ScrollArea>
+          </div>
         )}
       </CardContent>
     </Card>
@@ -660,15 +780,14 @@ const GeneratedInsightsTable = () => {
 
 export default function AiInsightsPage() {
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">AI Insights</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold">AI Insights</h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
           Get personalized financial insights powered by artificial intelligence
         </p>
       </div>
       <FinancialInsightsSummary />
-      <ChatbotInterface />
       <GeneratedInsightsTable />
     </div>
   );
