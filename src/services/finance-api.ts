@@ -1,3 +1,4 @@
+// /services/finance-api.ts
 import api from "./api";
 
 export interface Category {
@@ -52,6 +53,30 @@ export interface RecurringExpense {
   updated_at: string;
 }
 
+export interface AIInsight {
+  id: number;
+  insight_type: string;
+  insight_data:
+    | {
+        suggestions: Array<{
+          category: string;
+          message: string;
+        }>;
+      }
+    | string;
+  generated_date: string;
+  is_read: boolean;
+  user_id?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface GenerateInsightRequest {
+  insight_type: string;
+}
+
 // Simple helper to safely get array from response
 const safeArray = <T>(response: any): T[] => {
   // If it's already an array, return it
@@ -67,9 +92,15 @@ const safeArray = <T>(response: any): T[] => {
   if (response?.data?.budgets) return response.data.budgets;
   if (response?.data?.recurring_expenses)
     return response.data.recurring_expenses;
+  if (response?.data?.ai_insights) return response.data.ai_insights;
+  if (response?.data?.insights) return response.data.insights;
 
   // If response.data is an array
   if (Array.isArray(response?.data)) return response.data;
+
+  // For AI insights, might be in data.data format
+  if (response?.data?.data && Array.isArray(response.data.data))
+    return response.data.data;
 
   // Default to empty array
   return [];
@@ -231,5 +262,36 @@ export const financeApi = {
 
   deleteRecurringExpense: async (id: number) => {
     await api.delete(`/finance/recurring-expenses/${id}`);
+  },
+
+  // AI Insights
+  getInsights: async (): Promise<AIInsight[]> => {
+    const response = await api.get("/finance/ai-insights");
+    return safeArray<AIInsight>(response.data);
+  },
+
+  getInsight: async (id: number): Promise<AIInsight> => {
+    const response = await api.get<AIInsight>(`/finance/ai-insights/${id}`);
+    return response.data;
+  },
+
+  deleteInsight: async (id: number): Promise<void> => {
+    await api.delete(`/finance/ai-insights/${id}`);
+  },
+
+  markInsightAsRead: async (id: number): Promise<AIInsight> => {
+    const response = await api.patch<AIInsight>(
+      `/finance/ai-insights/${id}/read`
+    );
+    return response.data;
+  },
+
+  generateInsight: async (data: GenerateInsightRequest): Promise<AIInsight> => {
+    const response = await api.post("/finance/ai-insights/generate", data);
+    // Handle the nested response structure
+    if (response.data?.data?.insight) {
+      return response.data.data.insight;
+    }
+    return response.data;
   },
 };
