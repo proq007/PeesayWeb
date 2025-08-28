@@ -122,14 +122,6 @@ export default function DashboardLayout({
                   <span>Logout</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/settings">
-                    <Icons.settings className="size-4" />
-                    <span>Settings</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
           <div className="flex items-center justify-center space-x-2 p-2">
